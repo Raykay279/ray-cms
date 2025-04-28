@@ -4,3 +4,4 @@ from typing import Optional
 class User(BaseModel):
     email: str
     password: str
+    name: str

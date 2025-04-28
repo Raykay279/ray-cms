@@ -35,10 +35,11 @@ link = Table(
     Column("clicktext", String)
 )
 
-user = Table(
-    "user",
+user_table = Table(
+    "user_table",
     metadata,
     Column("id", Integer, primary_key=True),
+    Column("name", String)
     Column("email", String, index=True, unique=True),
     Column("password", String)
 )
