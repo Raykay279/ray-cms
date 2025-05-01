@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.post("/artikel", response_model=Artikel)
 async def add_artikel(new_artikel: Artikel):
-    query = artikel.insert(new_artikel).values(
+    query = artikel.insert().values(
         headline=new_artikel.headline,
         shorttext=new_artikel.shorttext,
         longtext=new_artikel.longtext

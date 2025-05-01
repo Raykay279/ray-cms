@@ -15,7 +15,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTEN = 30
 
 # Access Token erstellen
-def create_access_token(data: dict, expires_delta: timedelta = None)
+def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
 
     if expires_delta:

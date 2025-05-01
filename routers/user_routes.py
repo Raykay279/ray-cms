@@ -14,16 +14,22 @@ async def register(user: User):
     # PW hashen
     hashed_pw = hash_passwort(user.password)
 
+    # Check ob user schon vorhanden
+    query = usertabelle.select().where(usertabelle.c.email==user.email)
+    existing_user = await database.fetch_one(query)
+
+    if not existing_user:
     # DB Anfrage
-    query = usertabelle.insert().values(
-        username=user.name,
-        email=user.email,
-        password=hashed_pw
-    )
+        query = usertabelle.insert().values(
+            email=user.email,
+            password=hashed_pw
+     )
 
     # DB Ausführung
-    await database.execute(query)
-    return {"message": "Benutzer erfolgreich angelegt!"}
+        await database.execute(query)
+        return {"message": "Benutzer erfolgreich angelegt!"}
+    else:
+        raise HTTPException(status_code=400, detail="User bereits registriert")
 
 # Login
 @router.post("/login")
