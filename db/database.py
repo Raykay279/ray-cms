@@ -39,10 +39,8 @@ usertabelle = Table(
     "user",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("name", String),
     Column("email", String, index=True, unique=True),
     Column("password", String),
-    Column("username", String)
 )
 
 metadata.create_all(create_it)
