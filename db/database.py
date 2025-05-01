@@ -35,12 +35,13 @@ link = Table(
     Column("clicktext", String)
 )
 
-user = Table(
+usertabelle = Table(
     "user",
     metadata,
     Column("id", Integer, primary_key=True),
     Column("email", String, index=True, unique=True),
-    Column("password", String)
+    Column("password", String),
+    Column("name", String)
 )
 
 metadata.create_all(create_it)
