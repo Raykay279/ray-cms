@@ -16,7 +16,7 @@ async def register(user: User):
 
     # DB Anfrage
     query = usertabelle.insert().values(
-        name=user.name,
+        username=user.name,
         email=user.email,
         password=hashed_pw
     )
