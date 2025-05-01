@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from datetime import timedelta
+from datetime import timedelta, datetime
 from jose import jwt
 
 # PW-Hash Kontext initialisieren
