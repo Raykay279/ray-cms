@@ -35,13 +35,8 @@ link = Table(
     Column("clicktext", String)
 )
 
-<<<<<<< HEAD
 usertabelle = Table(
     "user",
-=======
-user_table = Table(
-    "user_table",
->>>>>>> a6b87553462968df752747f379ace47644458ad8
     metadata,
     Column("id", Integer, primary_key=True),
     Column("name", String)
