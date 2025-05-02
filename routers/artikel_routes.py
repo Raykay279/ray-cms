@@ -15,22 +15,36 @@ async def add_artikel(new_artikel: Artikel):
         longtext=new_artikel.longtext
     )
 
-    await database.execute(query)
-    return new_artikel
+    # Hole die ID des neuen Artikels
+    neue_id = await database.execute(query)
+
+    # Hole den Artikel inkl. ID aus der DB
+    get_query = artikel.select().where(artikel.c.id==neue_id)
+    created_article = await database.fetch_one(get_query)
+
+    print(created_article)
+    print(Artikel(**dict(created_article)))
+
+    return Artikel(**dict(created_article))
 
 # Alle Artikel abrufen
 @router.get("/artikel", response_model=List[Artikel])
 async def artikel_abruf():
     query = artikel.select()
-    return await database.fetch_all(query)
+    rows = await database.fetch_all(query)
+
+    for row in rows:
+        print(dict(row))  # 👈 Debug-Ausgabe ins Terminal
+
+    return [Artikel(**dict(row)) for row in rows]
 
 # Einzelne Artikel abrufen
 @router.get("/artikel/{id}", response_model=Artikel)
 async def einzelner_artikel_abruf(abruf_id: int):
     query = artikel.select().where(artikel.c.id == abruf_id)
-    abgerufener_artikel = database.fetch_one(query)
+    abgerufener_artikel = await database.fetch_one(query)
 
     if not abgerufener_artikel:
         raise HTTPException(status_code=404, detail="Kein Artikel mit der Such-ID gefunden")
-    else:
-        return abgerufener_artikel
+ 
+    return Artikel(**dict(abgerufener_artikel))
