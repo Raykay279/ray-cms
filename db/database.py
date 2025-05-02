@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine, MetaData, Column, Table, String, Integer
+from sqlalchemy import create_engine, MetaData, Column, Table, String, Integer, DateTime
 from databases import Database
+from datetime import datetime
 
 # DB Pfad
 DATABASE_URL = "sqlite:///./database.db"
@@ -17,6 +18,7 @@ artikel = Table(
     Column("headline", String),
     Column("shorttext", String),
     Column("longtext", String),
+    Column("created_at", DateTime, default=datetime.utcnow)
 )
 
 bild = Table(
@@ -24,7 +26,8 @@ bild = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("path", String),
-    Column("caption", String)
+    Column("caption", String),
+    Column("created_at", DateTime, default=datetime.utcnow)
 )
 
 link = Table(
@@ -32,7 +35,8 @@ link = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("url", String),
-    Column("clicktext", String)
+    Column("clicktext", String),
+    Column("created_at", DateTime, default=datetime.utcnow)
 )
 
 usertabelle = Table(
@@ -41,6 +45,7 @@ usertabelle = Table(
     Column("id", Integer, primary_key=True),
     Column("email", String, index=True, unique=True),
     Column("password", String),
+    Column("created_at", DateTime, default=datetime.utcnow)
 )
 
 metadata.create_all(create_it)
