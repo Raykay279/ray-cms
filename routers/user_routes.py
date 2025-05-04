@@ -63,7 +63,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/userlist", response_model=List[User])
-async def get_users(current_user: str = Depends(get_current_user)):
+async def get_users(current_user: dict = Depends(get_current_user)):
     
     if current_user["role"] != "admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")

@@ -9,7 +9,7 @@ router = APIRouter()
 
 # Artikel erstellen
 @router.post("/artikel", response_model=ArtikelCreate)
-async def add_artikel(new_artikel: ArtikelCreate, current_user: str = Depends(get_current_user)):
+async def add_artikel(new_artikel: ArtikelCreate, current_user: dict = Depends(get_current_user)):
 
     if current_user["role"] not in ["admin", "editor"]:
         raise HTTPException(status_code=403, detail=("Nicht berechtigt"))
@@ -46,7 +46,7 @@ async def einzelner_artikel_abruf(abruf_id: int):
 
 # Artikel aktualisieren
 @router.put("/artikel/{id}", response_model=Artikel)
-async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: str = Depends(get_current_user)):
+async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: dict = Depends(get_current_user)):
     
     if current_user["role"] not in ["admin", "editor"]:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
@@ -71,7 +71,7 @@ async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: str = D
 
 # Artikel teilweise aktualisieren
 @router.patch("/artikel/{id}", response_model=Artikel)
-async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: str = Depends(get_current_user)):
+async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: dict = Depends(get_current_user)):
     
     if current_user["role"] not in ["admin", "editor"]:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
@@ -99,7 +99,7 @@ async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: str =
 
 # Artikel löschen
 @router.delete("/artikel/{id}", response_model=Artikel)
-async def delete_artikel(id: int, current_user: str = Depends(get_current_user)):
+async def delete_artikel(id: int, current_user: dict = Depends(get_current_user)):
 
     if current_user["role"] not in ["admin", "editor"]:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
