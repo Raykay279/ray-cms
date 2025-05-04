@@ -46,7 +46,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Passwort nicht korrekt")
     
     # Token erzeugen
-    access_token_expire = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTEN)
+    access_token_expire = timedelta(ACCESS_TOKEN_EXPIRE_MINUTEN)
     access_token = create_access_token(
         data={"sub": found_user["email"]},
         expires_delta=access_token_expire

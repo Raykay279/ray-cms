@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from db.database import database, artikel
 from models.artikel import Artikel, ArtikelUpdate, ArtikelCreate
 from datetime import datetime
+from auth.security import get_current_user
 
 router = APIRouter()
 
 # Artikel erstellen
-
 @router.post("/artikel", response_model=ArtikelCreate)
-async def add_artikel(new_artikel: ArtikelCreate):
+async def add_artikel(new_artikel: ArtikelCreate, current_user: str = Depends(get_current_user)):
     query = artikel.insert().values(
         headline=new_artikel.headline,
         shorttext=new_artikel.shorttext,
@@ -42,7 +42,7 @@ async def einzelner_artikel_abruf(abruf_id: int):
 
 # Artikel aktualisieren
 @router.put("/artikel/{id}", response_model=Artikel)
-async def austausch_artikel(id: int, artikel_neu: Artikel):
+async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: str = Depends(get_current_user)):
     
     # Artikel suchen
     query = artikel.select().where(artikel.c.id == id)
@@ -64,7 +64,7 @@ async def austausch_artikel(id: int, artikel_neu: Artikel):
 
 # Artikel teilweise aktualisieren
 @router.patch("/artikel/{id}", response_model=Artikel)
-async def patch_artikel(id: int, artikel_neu: ArtikelUpdate):
+async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: str = Depends(get_current_user)):
     
     # Artikel suchen
     query = artikel.select().where(artikel.c.id == id)
@@ -89,7 +89,7 @@ async def patch_artikel(id: int, artikel_neu: ArtikelUpdate):
 
 # Artikel löschen
 @router.delete("/artikel/{id}", response_model=Artikel)
-async def delete_artikel(id: int):
+async def delete_artikel(id: int, current_user: str = Depends(get_current_user)):
 
     #Treffer suchen
     query = artikel.select().where(artikel.c.id == id)

@@ -12,7 +12,7 @@ load_dotenv()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # Funktion, die den aktuellen Benutzer ermittelt und validiert
-def get_current_user(token: str = Depends(oauth2scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme)):
 
     # Fehlender oder falscher Token
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht autorisiert", headers={"WWW-Authenticate": "Bearer"})
@@ -41,7 +41,7 @@ def hash_passwort(passwort: str):
 # Token konfiguration
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTEN = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTEN")
+ACCESS_TOKEN_EXPIRE_MINUTEN = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTEN", 30))
 
 # Access Token erstellen
 def create_access_token(data: dict, expires_delta: timedelta = None):
