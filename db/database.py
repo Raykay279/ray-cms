@@ -45,7 +45,7 @@ usertabelle = Table(
     Column("id", Integer, primary_key=True),
     Column("email", String, index=True, unique=True),
     Column("password", String),
-    Column("created_at", DateTime, default=datetime.utcnow)
+    Column("role", String)
 )
 
 metadata.create_all(create_it)

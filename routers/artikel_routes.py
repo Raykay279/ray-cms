@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from typing import List
 from db.database import database, artikel
 from models.artikel import Artikel, ArtikelUpdate, ArtikelCreate
@@ -10,6 +10,10 @@ router = APIRouter()
 # Artikel erstellen
 @router.post("/artikel", response_model=ArtikelCreate)
 async def add_artikel(new_artikel: ArtikelCreate, current_user: str = Depends(get_current_user)):
+
+    if current_user["role"] not in ["admin", "editor"]:
+        raise HTTPException(status_code=403, detail=("Nicht berechtigt"))
+
     query = artikel.insert().values(
         headline=new_artikel.headline,
         shorttext=new_artikel.shorttext,
@@ -44,6 +48,9 @@ async def einzelner_artikel_abruf(abruf_id: int):
 @router.put("/artikel/{id}", response_model=Artikel)
 async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: str = Depends(get_current_user)):
     
+    if current_user["role"] not in ["admin", "editor"]:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
+
     # Artikel suchen
     query = artikel.select().where(artikel.c.id == id)
     betroffener_artikel = await database.fetch_one(query)
@@ -66,6 +73,9 @@ async def austausch_artikel(id: int, artikel_neu: Artikel, current_user: str = D
 @router.patch("/artikel/{id}", response_model=Artikel)
 async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: str = Depends(get_current_user)):
     
+    if current_user["role"] not in ["admin", "editor"]:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
+
     # Artikel suchen
     query = artikel.select().where(artikel.c.id == id)
     betroffener_artikel = await database.fetch_one(query)
@@ -90,6 +100,9 @@ async def patch_artikel(id: int, artikel_neu: ArtikelUpdate, current_user: str =
 # Artikel löschen
 @router.delete("/artikel/{id}", response_model=Artikel)
 async def delete_artikel(id: int, current_user: str = Depends(get_current_user)):
+
+    if current_user["role"] not in ["admin", "editor"]:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
 
     #Treffer suchen
     query = artikel.select().where(artikel.c.id == id)

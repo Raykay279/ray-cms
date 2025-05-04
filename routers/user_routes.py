@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from db.database import database, usertabelle
 from models.user import User
-from auth.security import hash_passwort, create_access_token, pwd_context, ACCESS_TOKEN_EXPIRE_MINUTEN
+from auth.security import hash_passwort, create_access_token, pwd_context, ACCESS_TOKEN_EXPIRE_MINUTEN, get_current_user
+from typing import List
+
 
 router = APIRouter()
 
@@ -22,7 +24,8 @@ async def register(user: User):
     # DB Anfrage
         query = usertabelle.insert().values(
             email=user.email,
-            password=hashed_pw
+            password=hashed_pw,
+            role=user.role
      )
 
     # DB Ausführung
@@ -45,11 +48,27 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not pwd_context.verify(form_data.password, found_user["password"]):
         raise HTTPException(status_code=400, detail="Passwort nicht korrekt")
     
+    print("Gefundener Benutzer:", dict(found_user))
+    
     # Token erzeugen
     access_token_expire = timedelta(ACCESS_TOKEN_EXPIRE_MINUTEN)
     access_token = create_access_token(
-        data={"sub": found_user["email"]},
+        data={
+            "sub": found_user["email"],
+            "role": found_user["role"]
+        },
         expires_delta=access_token_expire
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/userlist", response_model=List[User])
+async def get_users(current_user: str = Depends(get_current_user)):
+    
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht berechtigt")
+
+    query = usertabelle.select()
+    userliste = await database.fetch_all(query)
+
+    return [User(**dict(user)) for user in userliste]
