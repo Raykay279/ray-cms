@@ -1,18 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from db.database import database, artikel
-from models.artikel import Artikel, ArtikelUpdate
+from models.artikel import Artikel, ArtikelUpdate, ArtikelCreate
+from datetime import datetime
 
 router = APIRouter()
 
 # Artikel erstellen
 
-@router.post("/artikel", response_model=Artikel)
-async def add_artikel(new_artikel: Artikel):
+@router.post("/artikel", response_model=ArtikelCreate)
+async def add_artikel(new_artikel: ArtikelCreate):
     query = artikel.insert().values(
         headline=new_artikel.headline,
         shorttext=new_artikel.shorttext,
-        longtext=new_artikel.longtext
+        longtext=new_artikel.longtext,
+        created_at=datetime.utcnow()
     )
 
     await database.execute(query)

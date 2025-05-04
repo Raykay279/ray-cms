@@ -1,32 +1,61 @@
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
-from db.database import database, user_table
-from models.user import User
-from auth.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTEN, pwd_context, hash_passwort
+from passlib.context import CryptContext
+from jose import jwt, JWTError
+from datetime import datetime, timedelta
+from fastapi import HTTPException, Depends, status
+from fastapi.security import OAuth2AuthorizationCodeBearer
+import os
+from dotenv import load_dotenv
 
-router = APIRouter()
+# Env variables laden
+load_dotenv()
 
-#Registrieren
-@router.post("login")
+# Env setzen
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTEN = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTEN")
 
-#Passwort hashen
-async def benutzer_registrieren(user: User);
-    hashed_pw = hash_passwort.hash(user.password)
+# PW Hashconfig
+pw_hashing = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-#User anlegen
-    query = user_table.inser().values(
-        email=user.email,
-        passwort=hashed_pw,
-        name=user.name
-    )
+# PW hashen
+def pw_hash(password: str):
+    return pw_hashing.hash(password)
 
-    await database.execute(query)
+# Access Token erstellen
 
-    return {"message": "Angekommen"}
+def acces_token(data: dict, expire_time: timedelta = None):
+    daten = data.copy()
 
-# User login
-@router.post("/login")
-async def user_login(user_form: OAuth2PasswordRequestForm, Depends()):
-    query = user_table.select().where(user_form.email == user_table.c.email)
-    user = await database.fetch(query)
+    if expire_time:
+        expire = datetime.utcnow() + expire_time
+    else:
+        expire = datetime.utcnow() + ACCESS_TOKEN_EXPIRE_MINUTEN
+
+    daten.update({"exp": expire})
+
+    token = jwt.encode(daten, SECRET_KEY, algorithm=ALGORITHM)
+
+    return token
+
+# Tokenprüfung config
+oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="login")
+
+# Tokenprüfung durchführen
+def check_token(token: str = Depends(oauth2_scheme)):
+
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Nicht autorisierter Zugriff", headers={"WWW-Authenticate": "Bearer"})
+
+    try:
+        payload = jwt.encode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        user_mail: str = payload.get("sub")
+
+        if user_mail is None:
+            raise credentials_exception
+        
+        return user_mail
+    
+    except JWTError:
+        raise credentials_exception
+    
+

@@ -10,14 +10,19 @@ class Artikel(BaseModel):
     created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        form_attributes = True
+
+
+class ArtikelCreate(BaseModel):
+    headline: str
+    shorttext: Optional[str] = None
+    longtext: str
+
 
 class ArtikelUpdate(BaseModel):
-    id: Optional[int] = None
     headline: Optional[str] = None
     shorttext: Optional[str] = None
     longtext: Optional[str] = None
-    created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        form_attributes = True
