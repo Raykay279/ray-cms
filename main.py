@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from db.database import database
-from routers import artikel_routes, user_routes
+from routers import artikel_routes, user_routes, bild_routes, link_routes
 
 app = FastAPI()
 
 # Router einbinden
 app.include_router(user_routes.router)
 app.include_router(artikel_routes.router)
+app.include_router(bild_routes.router)
+app.include_router(link_routes.router)
 
 # DB Verbinden
 @app.on_event("startup")

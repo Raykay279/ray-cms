@@ -2,9 +2,23 @@ from pydantic import BaseModel
 from typing import Optional
 
 class Link(BaseModel):
-    url = str
-    clicktext = str
+    id: Optional[int] = None
+    url: str
+    clicktext: str
+
+    class Config:
+        form_attributes = True
 
 class LinkUpdate(BaseModel):
-    url = Optional[str] = None
-    clicktext = Optional[str] = None
+    url:Optional[str] = None
+    clicktext: Optional[str] = None
+
+    class Config:
+        form_attributes = True
+
+class LinkCreate(BaseModel):
+    url: Optional[str] = None
+    clicktext: Optional[str] = None
+
+    class Config:
+        form_attributes = True
